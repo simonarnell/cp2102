@@ -53,11 +53,14 @@ class cp2102 extends EventEmitter {
       },
       data: undefined,
     }];
-    this.device.open(false); // don't auto-configure
+    this.device.open();
     const self = this;
 
     this.device.setConfiguration(1, () => {
       [self.iface] = this.device.interfaces;
+      if (self.iface.isKernelDriverActive()) {
+        self.iface.detachKernelDriver();
+      }
       self.iface.claim();
       self.inEndpoint = self.iface.endpoint(opts.inEndpointAddress || 0x81);
       if (opts.transfers != null && opts.wordLength != null) {
